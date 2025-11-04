@@ -1,15 +1,12 @@
 @import "tailwindcss";
 
+/* ============================================
+   BASE VARIABLES
+   ============================================ */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +16,151 @@
   }
 }
 
+/* ============================================
+   TAILWIND THEME EXTENSION
+   ============================================ */
+
+@theme {
+  /* Paradox brand colors */
+  --color-paradox-dark: #0a0a0f;
+  --color-paradox-midnight: #1a1a2e;
+  
+  /* Purple scale */
+  --color-paradox-purple-50: #faf5ff;
+  --color-paradox-purple-100: #f3e8ff;
+  --color-paradox-purple-200: #e9d5ff;
+  --color-paradox-purple-300: #d8b4fe;
+  --color-paradox-purple-400: #c084fc;
+  --color-paradox-purple-500: #a855f7;
+  --color-paradox-purple-600: #9333ea;
+  --color-paradox-purple-700: #7e22ce;
+  --color-paradox-purple-800: #6b21a8;
+  --color-paradox-purple-900: #581c87;
+  
+  /* Blue scale */
+  --color-paradox-blue-50: #eff6ff;
+  --color-paradox-blue-100: #dbeafe;
+  --color-paradox-blue-200: #bfdbfe;
+  --color-paradox-blue-300: #93c5fd;
+  --color-paradox-blue-400: #60a5fa;
+  --color-paradox-blue-500: #3b82f6;
+  --color-paradox-blue-600: #2563eb;
+  --color-paradox-blue-700: #1d4ed8;
+  --color-paradox-blue-800: #1e40af;
+  --color-paradox-blue-900: #1e3a8a;
+  
+  /* Relationship colors */
+  --color-buddy: #10b981;
+  --color-rival: #ef4444;
+  --color-neutral: #6b7280;
+  
+  /* Animations */
+  --animate-fade-in: fade-in 0.5s ease-in-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   CUSTOM UTILITY CLASSES
+   ============================================ */
+
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+}
+
+.glass-dark {
+  background: rgba(10, 10, 15, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+}
+
+.text-paradox-gradient {
+  background: linear-gradient(135deg, #c084fc 0%, #60a5fa 50%, #c084fc 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+}
+
+.bg-paradox-gradient {
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+}
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9333ea;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
+}
+
+/* ============================================
+   SELECTION STYLING
+   ============================================ */
+
+::selection {
+  background: rgba(168, 85, 247, 0.3);
+  color: white;
+}
+
+::-moz-selection {
+  background: rgba(168, 85, 247, 0.3);
+  color: white;
 }
