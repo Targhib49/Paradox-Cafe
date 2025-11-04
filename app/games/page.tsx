@@ -90,7 +90,7 @@ export default async function GamesPage() {
                 {game.status === 'Available' ? (
                   <Link
                     href={`/games/${game.id}`}
-                    className={`inline-block px-6 py-3 bg-gradient-to-r ${game.color} text-white font-semibold rounded-lg hover:scale-105 transition transform`}
+                    className={`inline-block px-6 py-3 bg-linear-to-r ${game.color} text-white font-semibold rounded-lg hover:scale-105 transition transform`}
                   >
                     Play Now
                   </Link>

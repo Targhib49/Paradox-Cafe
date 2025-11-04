@@ -23,8 +23,8 @@ export function Header({ profile }: HeaderProps) {
           <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
             <span className="text-3xl">🌀</span>
             <div>
-              <h1 className="text-xl font-bold text-white">Blackjet</h1>
-              <p className="text-xs text-gray-500">Paradox Persona System</p>
+              <h1 className="text-xl font-bold text-white">Paradox Cafe</h1>
+              <p className="text-xs text-gray-500">by Blackjet Dev</p>
             </div>
           </Link>
 

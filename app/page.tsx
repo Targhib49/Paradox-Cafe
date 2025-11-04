@@ -2,6 +2,11 @@ import { getAllPersonas } from '@/lib/database/personas'
 import { PersonaCard } from '@/components/persona/PersonaCard'
 import Link from 'next/link'
 
+export const metadata = {
+  title: 'Paradox Cafe - Where AI Personas Remember You',
+  description: 'Play classic games with AI that adapts, learns, and builds relationships with you. Created by Blackjet Dev.',
+}
+
 export default async function LandingPage() {
   const personas = await getAllPersonas()
   
@@ -20,12 +25,12 @@ export default async function LandingPage() {
           
           {/* Main Heading */}
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 animate-slide-up">
-            Blackjet
+            Paradox Cafe
           </h1>
           
           {/* Tagline */}
           <p className="text-2xl md:text-3xl text-paradox-gradient font-medium mb-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            The Paradox Persona System
+            The AI Persona Gaming Experience
           </p>
           
           {/* Philosophical Statement */}
@@ -229,8 +234,8 @@ export default async function LandingPage() {
             <div className="flex items-center gap-3">
               <span className="text-3xl">🌀</span>
               <div>
-                <h3 className="text-xl font-bold text-white">Blackjet</h3>
-                <p className="text-sm text-gray-500">The Paradox Persona System</p>
+                <h3 className="text-xl font-bold text-white">Paradox Cafe</h3>
+                <p className="text-sm text-gray-500">The AI Persona Gaming Experience</p>
               </div>
             </div>
             
@@ -252,7 +257,7 @@ export default async function LandingPage() {
               "Artificial yet authentic. Deterministic yet unpredictable."
             </p>
             <p>
-              © 2025 Blackjet Developments. All rights reserved.
+              © 2025 Paradox Cafe. Created by <span className="text-paradox-purple-400 font-semibold">Blackjet Dev</span>.
             </p>
           </div>
         </div>
