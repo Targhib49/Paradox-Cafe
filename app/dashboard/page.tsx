@@ -152,7 +152,7 @@ export default async function DashboardPage() {
             </p>
             <Link
               href="/personas"
-              className="inline-block px-8 py-4 bg-gradient-to-r from-paradox-purple-600 to-paradox-blue-600 text-white text-lg font-semibold rounded-xl hover:from-paradox-purple-500 hover:to-paradox-blue-500 transition transform hover:scale-105"
+              className="inline-block px-8 py-4 bg-linear-to-r from-paradox-purple-600 to-paradox-blue-600 text-white text-lg font-semibold rounded-xl hover:from-paradox-purple-500 hover:to-paradox-blue-500 transition transform hover:scale-105"
             >
               Meet the Personas
             </Link>
