@@ -1,6 +1,6 @@
 'use client'
 
-import type { Board as BoardType, Cell as CellType } from '@/lib/game/battleship/types'
+import type { Board as BoardType, Cell as CellType, SpecialShip, BombTrap } from '@/lib/game/battleship/types'
 import { Cell } from './Cell'
 
 interface BoardProps {
@@ -8,8 +8,10 @@ interface BoardProps {
   isPlayerBoard: boolean
   onCellClick?: (row: number, col: number) => void
   disabled?: boolean
-  clickable?: boolean  // ADD THIS
+  clickable?: boolean
   label: string
+  specialShips?: SpecialShip[]  // NEW: Pass special ships to highlight
+  traps?: BombTrap[]            // NEW: Pass traps to show
 }
 
 export function Board({ 
@@ -17,12 +19,31 @@ export function Board({
   isPlayerBoard, 
   onCellClick, 
   disabled = false,
-  clickable = false,  // ADD THIS
-  label 
+  clickable = false,
+  label,
+  specialShips = [],  // NEW
+  traps = []          // NEW
 }: BoardProps) {
   const handleCellClick = (row: number, col: number) => {
     if (disabled) return
     onCellClick?.(row, col)
+  }
+  
+  // Helper to check if cell is part of special ship
+  const isSpecialShipCell = (row: number, col: number): boolean => {
+    const cell = board[row][col]
+    if (!cell.shipId) return false
+    
+    return specialShips.some(ship => ship.id === cell.shipId)
+  }
+  
+  // Helper to check if cell has trap
+  const hasTrapAtCell = (row: number, col: number): boolean => {
+    return traps.some(trap => 
+      trap.position.row === row && 
+      trap.position.col === col &&
+      !trap.triggered
+    )
   }
   
   return (
@@ -66,12 +87,36 @@ export function Board({
                 isPlayerBoard={isPlayerBoard}
                 onClick={() => handleCellClick(rowIndex, colIndex)}
                 disabled={disabled}
-                clickable={clickable}  // PASS IT DOWN
+                clickable={clickable}
+                isSpecialShip={isSpecialShipCell(rowIndex, colIndex)}  // NEW
+                hasTrap={hasTrapAtCell(rowIndex, colIndex)}            // NEW
               />
             ))}
           </div>
         ))}
       </div>
+      
+      {/* Legend (only for player boards) */}
+      {isPlayerBoard && (specialShips.length > 0 || traps.length > 0) && (
+        <div className="flex justify-center gap-4 text-xs mt-2">
+          {specialShips.length > 0 && (
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 bg-linear-to-br from-yellow-500 to-amber-600 rounded border border-white/20"></div>
+              <span className="text-gray-400">Special Ships</span>
+            </div>
+          )}
+          {traps.length > 0 && (
+            <div className="flex items-center gap-1">
+              <span className="text-purple-400">💣</span>
+              <span className="text-gray-400">Bomb Traps</span>
+            </div>
+          )}
+          <div className="flex items-center gap-1">
+            <div className="w-4 h-4 bg-[#6366f1] rounded border border-white/20"></div>
+            <span className="text-gray-400">Regular Ships</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

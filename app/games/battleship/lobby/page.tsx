@@ -3,13 +3,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useBattleshipStore } from '@/lib/stores/battleshipStore'
+import { useBattleship2v2Store } from '@/lib/stores/battleship2v2Store'
 import type { Difficulty } from '@/lib/game/battleship/types'
 
 type GameMode = '1v1' | '2v2'
 
 export default function BattleshipLobbyPage() {
   const router = useRouter()
-  const { setDifficulty, startNewGame } = useBattleshipStore()
+  const { setDifficulty: set1v1Difficulty, startNewGame: start1v1 } = useBattleshipStore()
+  const { startNewGame: start2v2 } = useBattleship2v2Store()
   
   const [selectedMode, setSelectedMode] = useState<GameMode>('1v1')
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('medium')
@@ -17,9 +19,14 @@ export default function BattleshipLobbyPage() {
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null)
   
   const handleStartGame = () => {
-    setDifficulty(selectedDifficulty)
-    startNewGame()
-    router.push('/games/battleship/setup')
+    if (selectedMode === '1v1') {
+      set1v1Difficulty(selectedDifficulty)
+      start1v1()
+      router.push('/games/battleship/setup')
+    } else {
+      start2v2()
+      router.push('/games/battleship/setup-2v2')
+    }
   }
   
   return (
@@ -28,7 +35,7 @@ export default function BattleshipLobbyPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            ⚓ Battleship
+            ⚓ Battleship Reforged
           </h1>
           <p className="text-gray-400">
             Configure your game settings
@@ -67,16 +74,21 @@ export default function BattleshipLobbyPage() {
                 </p>
               </button>
               
-              {/* 2v2 Mode - Coming Soon */}
+              {/* 2v2 Mode */}
               <button
-                disabled
-                className="p-4 rounded-lg border-2 border-dashed border-white/10 text-gray-500 text-left cursor-not-allowed relative overflow-hidden"
+                onClick={() => setSelectedMode('2v2')}
+                className={`p-4 rounded-lg border-2 transition text-left relative ${
+                  selectedMode === '2v2'
+                    ? 'bg-paradox-purple-600 border-paradox-purple-400 text-white'
+                    : 'bg-white/5 border-white/20 text-white hover:border-paradox-purple-500'
+                }`}
               >
-                <div className="absolute top-2 right-2 bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded">
-                  Coming Soon
+                <div className="absolute top-2 right-2 bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded">
+                  New!
                 </div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl opacity-50">🤝</span>
+                  <span className="text-2xl">🤝</span>
+                  {selectedMode === '2v2' && <span className="text-lg">✓</span>}
                 </div>
                 <p className="font-semibold">2v2 Teams</p>
                 <p className="text-xs opacity-75 mt-1">
@@ -84,82 +96,138 @@ export default function BattleshipLobbyPage() {
                 </p>
               </button>
             </div>
+            
+            {/* Mode Description */}
+            {selectedMode === '2v2' && (
+              <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <p className="text-sm text-blue-300 mb-2">
+                  <span className="font-semibold">2v2 Features:</span>
+                </p>
+                <ul className="text-xs text-blue-200/80 space-y-1">
+                  <li>• 4 boards: You, Buddy, Enemy 1, Enemy 2</li>
+                  <li>• 3 Special Ships (win conditions)</li>
+                  <li>• 3 Bomb Traps (skip turn + reveal area)</li>
+                  <li>• Strategic placement across team boards</li>
+                  <li>• Cooperative AI teammate</li>
+                </ul>
+              </div>
+            )}
           </div>
           
-          {/* Opponent Selection */}
-          <div className="glass p-6 rounded-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-white">Opponent</h2>
-              <button
-                onClick={() => setUsePersona(!usePersona)}
-                className="text-xs text-paradox-purple-400 hover:text-paradox-purple-300 transition"
-              >
-                {usePersona ? 'Use AI Difficulty' : 'Use Persona (Preview)'}
-              </button>
-            </div>
-            
-            {!usePersona ? (
-              // AI Difficulty Selector (Compact)
-              <div className="space-y-2">
-                {[
-                  { value: 'easy' as Difficulty, label: 'Easy', emoji: '😊', desc: 'Random shooting' },
-                  { value: 'medium' as Difficulty, label: 'Medium', emoji: '😐', desc: 'Hunt & target' },
-                  { value: 'hard' as Difficulty, label: 'Hard', emoji: '😈', desc: 'Probability-based' }
-                ].map(diff => (
-                  <button
-                    key={diff.value}
-                    onClick={() => setSelectedDifficulty(diff.value)}
-                    className={`w-full p-3 rounded-lg border-2 transition text-left ${
-                      selectedDifficulty === diff.value
-                        ? 'bg-paradox-purple-600 border-paradox-purple-400 text-white'
-                        : 'bg-white/5 border-white/20 text-white hover:border-paradox-purple-500'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{diff.emoji}</span>
-                      <div className="flex-1">
-                        <p className="font-semibold">{diff.label}</p>
-                        <p className="text-xs opacity-75">{diff.desc}</p>
-                      </div>
-                      {selectedDifficulty === diff.value && (
-                        <span className="text-lg">✓</span>
-                      )}
-                    </div>
-                  </button>
-                ))}
+          {/* Opponent Selection (only for 1v1) */}
+          {selectedMode === '1v1' && (
+            <div className="glass p-6 rounded-xl">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-white">Opponent</h2>
+                <button
+                  onClick={() => setUsePersona(!usePersona)}
+                  className="text-xs text-paradox-purple-400 hover:text-paradox-purple-300 transition"
+                >
+                  {usePersona ? 'Use AI Difficulty' : 'Use Persona (Preview)'}
+                </button>
               </div>
-            ) : (
-              // Persona Selector (Placeholder)
+              
+              {!usePersona ? (
+                // AI Difficulty Selector (Compact)
+                <div className="space-y-2">
+                  {[
+                    { value: 'easy' as Difficulty, label: 'Easy', emoji: '😊', desc: 'Random shooting' },
+                    { value: 'medium' as Difficulty, label: 'Medium', emoji: '😐', desc: 'Hunt & target' },
+                    { value: 'hard' as Difficulty, label: 'Hard', emoji: '😈', desc: 'Probability-based' }
+                  ].map(diff => (
+                    <button
+                      key={diff.value}
+                      onClick={() => setSelectedDifficulty(diff.value)}
+                      className={`w-full p-3 rounded-lg border-2 transition text-left ${
+                        selectedDifficulty === diff.value
+                          ? 'bg-paradox-purple-600 border-paradox-purple-400 text-white'
+                          : 'bg-white/5 border-white/20 text-white hover:border-paradox-purple-500'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{diff.emoji}</span>
+                        <div className="flex-1">
+                          <p className="font-semibold">{diff.label}</p>
+                          <p className="text-xs opacity-75">{diff.desc}</p>
+                        </div>
+                        {selectedDifficulty === diff.value && (
+                          <span className="text-lg">✓</span>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                // Persona Selector (Placeholder)
+                <div className="space-y-2">
+                  {[
+                    { id: 'max', name: 'Max', emoji: '🧠', trait: 'The Strategist', locked: true },
+                    { id: 'rhea', name: 'Rhea', emoji: '✨', trait: 'The Charmer', locked: true },
+                    { id: 'kai', name: 'Kai', emoji: '🎭', trait: 'The Thinker', locked: true }
+                  ].map(persona => (
+                    <button
+                      key={persona.id}
+                      disabled={persona.locked}
+                      className="w-full p-3 rounded-lg border-2 border-dashed border-white/10 text-gray-500 text-left cursor-not-allowed relative"
+                    >
+                      <div className="absolute top-2 right-2 bg-blue-500/20 text-blue-400 text-xs px-2 py-1 rounded">
+                        Locked
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl opacity-50">{persona.emoji}</span>
+                        <div className="flex-1">
+                          <p className="font-semibold">{persona.name}</p>
+                          <p className="text-xs opacity-75">{persona.trait}</p>
+                        </div>
+                        <span className="text-lg">🔒</span>
+                      </div>
+                    </button>
+                  ))}
+                  <p className="text-xs text-center text-gray-500 mt-3">
+                    Persona system coming in future update
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Buddy Selection (only for 2v2) */}
+          {selectedMode === '2v2' && (
+            <div className="glass p-6 rounded-xl">
+              <h2 className="text-xl font-bold text-white mb-4">Your Buddy</h2>
+              
               <div className="space-y-2">
                 {[
-                  { id: 'max', name: 'Max', emoji: '🧠', trait: 'The Strategist', locked: true },
-                  { id: 'rhea', name: 'Rhea', emoji: '✨', trait: 'The Charmer', locked: true },
-                  { id: 'kai', name: 'Kai', emoji: '🎭', trait: 'The Thinker', locked: true }
-                ].map(persona => (
+                  { id: 'max', name: 'Max', emoji: '🧠', trait: 'The Strategist', style: 'Analytical & Precise' },
+                  { id: 'rhea', name: 'Rhea', emoji: '✨', trait: 'The Charmer', style: 'Intuitive & Bold' },
+                  { id: 'kai', name: 'Kai', emoji: '🎭', trait: 'The Thinker', style: 'Observant & Adaptive' }
+                ].map(buddy => (
                   <button
-                    key={persona.id}
-                    disabled={persona.locked}
-                    className="w-full p-3 rounded-lg border-2 border-dashed border-white/10 text-gray-500 text-left cursor-not-allowed relative"
+                    key={buddy.id}
+                    disabled
+                    className="w-full p-4 rounded-lg border-2 border-dashed border-white/10 text-gray-500 text-left cursor-not-allowed relative"
                   >
-                    <div className="absolute top-2 right-2 bg-blue-500/20 text-blue-400 text-xs px-2 py-1 rounded">
-                      Locked
+                    <div className="absolute top-2 right-2 bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded">
+                      Coming Soon
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl opacity-50">{persona.emoji}</span>
+                      <span className="text-3xl opacity-50">{buddy.emoji}</span>
                       <div className="flex-1">
-                        <p className="font-semibold">{persona.name}</p>
-                        <p className="text-xs opacity-75">{persona.trait}</p>
+                        <p className="font-semibold text-base">{buddy.name}</p>
+                        <p className="text-xs opacity-75 mb-1">{buddy.trait}</p>
+                        <p className="text-xs opacity-60">{buddy.style}</p>
                       </div>
                       <span className="text-lg">🔒</span>
                     </div>
                   </button>
                 ))}
-                <p className="text-xs text-center text-gray-500 mt-3">
-                  Persona system coming in future update
-                </p>
               </div>
-            )}
-          </div>
+              
+              <p className="text-xs text-center text-gray-500 mt-4">
+                For now, you'll play with Max (default buddy)
+              </p>
+            </div>
+          )}
           
           {/* Future Features Placeholder */}
           <div className="glass p-6 rounded-xl border-2 border-dashed border-white/10">

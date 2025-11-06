@@ -143,3 +143,95 @@ export interface AttackResult {
   shipSunk: boolean
   position: Position
 }
+
+// ============================================
+// 2v2 GAME MODE TYPES
+// ============================================
+
+export type GameMode = '1v1' | '2v2'
+
+export type Player = 'user' | 'buddy' | 'enemy1' | 'enemy2'
+
+export type Team = 'allies' | 'enemies'
+
+// Special ships (win conditions for 2v2)
+export type SpecialShipType = 'commander' | 'mother' | 'scout'
+
+export interface SpecialShip extends Ship {
+  specialType: SpecialShipType
+  boardOwner: Player // Which board this ship is on
+}
+
+export const SPECIAL_SHIP_CONFIGS: { type: SpecialShipType; length: number; name: string }[] = [
+  { type: 'commander', length: 5, name: 'Commander Ship' },
+  { type: 'mother', length: 4, name: 'Mother Ship' },
+  { type: 'scout', length: 3, name: 'Scout Ship' },
+]
+
+// Bomb traps (defensive mechanism)
+export interface BombTrap {
+  id: string
+  boardOwner: Player // Which board this trap is on
+  position: Position
+  triggered: boolean
+  revealRadius: number // Default: 1 (3x3 area)
+}
+
+// Team structure for 2v2
+export interface TeamData {
+  regularShips: Ship[] // 10 total (5 per player)
+  specialShips: SpecialShip[] // 3 total (can be on any allied board)
+  bombTraps: BombTrap[] // 3 total (can be on any allied board)
+}
+
+// Extended game state for 2v2
+export interface GameState2v2 {
+  mode: '2v2'
+  phase: GamePhase
+  turn: Turn
+  
+  // 4 boards
+  userBoard: Board
+  buddyBoard: Board
+  enemy1Board: Board
+  enemy2Board: Board
+  
+  // Team data
+  alliesTeam: TeamData
+  enemiesTeam: TeamData
+  
+  // Current turn (both teammates move simultaneously)
+  turnPhase: 'allies' | 'enemies'
+  
+  // Turn skip tracking (for bomb traps)
+  skippedPlayers: Player[]
+  
+  // Buddy AI personality
+  buddyPersona: 'max' | 'rhea' | 'kai' | null
+  
+  // Game history and state
+  moves: Move[]
+  winner: 'user' | 'ai' | null
+  startedAt: Date | null
+  endedAt: Date | null
+}
+
+// Attack target for 2v2
+export interface Attack2v2 {
+  attacker: Player
+  targetBoard: Player
+  position: Position
+}
+
+// Attack result with trap info
+export interface AttackResult2v2 extends AttackResult {
+  trapTriggered: boolean
+  revealedCells?: Position[] // If trap triggered, cells revealed
+}
+
+// Win condition for 2v2
+export interface WinCondition2v2 {
+  team: Team
+  specialShipsSunk: number // Must sink all 3
+  remainingSpecialShips: SpecialShip[]
+}
